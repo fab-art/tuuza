@@ -11,3 +11,7 @@
 @keyframes bootpulse{50%{opacity:.45;transform:scale(.94)}}
 @supports(padding:max(0px)){.topbar{padding-top:max(0px,env(safe-area-inset-top))}.footer{padding-bottom:max(0px,env(safe-area-inset-bottom))}.toast{margin-bottom:env(safe-area-inset-bottom)}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+.proc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.proc-tabs button{border:1px solid #d8dee4;background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font:inherit}.proc-tabs button.on{background:#0f766e;color:#fff;border-color:#0f766e}
+.pc{width:96px;padding:7px 8px;border:1px solid #d8dee4;border-radius:8px;text-align:right;font:inherit}.pc-low{background:#e8f7ef}.pc-on{outline:2px solid #0f766e}
+.sug{position:absolute;left:0;right:0;top:100%;z-index:20;background:#fff;border:1px solid #d8dee4;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);margin-top:4px;overflow:hidden}.sug>div{padding:9px 12px;cursor:pointer;display:flex;flex-direction:column}.sug>div.on,.sug>div:hover{background:#e6f4f1}.sug small{color:#667}
