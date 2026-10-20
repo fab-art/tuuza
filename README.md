@@ -21,7 +21,9 @@ npm run preview
 1. Push this project folder to a Git repository.
 2. Import the repository in Vercel.
 3. Select the **Vite** framework preset. Build command: `npm run build`; output directory: `dist`.
-4. Deploy. `vercel.json` includes SPA fallback rewrites.
+4. Deploy. `vercel.json` adds SPA fallback rewrites (extension-less paths only, so `sw.js`, the manifest and assets are never rewritten) and cache headers (`sw.js` always revalidated, `/assets/*` immutable).
+
+Requires Node 18.18+. `xlsx` is installed from the SheetJS CDN tarball (the npm `xlsx@0.18.5` release has known security advisories); the install step needs outbound access to `cdn.sheetjs.com`, which Vercel allows.
 
 ## What's implemented
 
@@ -32,8 +34,9 @@ npm run preview
 - XLSX/CSV import, duplicate-aware append, CSV exports and basic operational reports.
 - Supplier directory (basic add/remove).
 - Draft requisitions from selected products, editable status and CSV export.
-- Installable PWA manifest and versioned static asset caching.
-- Local persistence using browser `localStorage`.
+- Installable PWA: manifest with 192/512/maskable PNG icons, apple-touch-icon, auto-updating service worker.
+- Local persistence using IndexedDB (catalogue) and `localStorage` (suppliers, requisitions).
+- Offline support via a precaching service worker; in-app install button and offline indicator.
 
 ## Storage limitation
 
@@ -43,7 +46,7 @@ Quotation OCR, editable quotation line persistence, alias approval, price compar
 
 The supplied spreadsheet is treated as a **working reference register**, not independently verified regulatory truth. All imported records start with `source-imported-unverified`. Do not infer that missing information means a product is unregistered. Verify registration status with the current official source before making regulatory or purchasing decisions.
 
-The initial data set is bundled into `src-data.json` (about 1.5 MB) and is loaded into the browser on first run. Product and operational edits are persisted in `localStorage` on that browser/device. Export regular backups.
+The initial data set lives in `src/data/medicines.json` (about 1.5 MB). It is code-split and lazy-loaded on first run only; afterwards the catalogue is read from IndexedDB. Product edits are saved in IndexedDB (with a localStorage fallback); suppliers and requisitions use localStorage. Export regular backups.
 
 ## Data import
 
