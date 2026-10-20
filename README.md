@@ -1,6 +1,6 @@
-# TUUZA Pharmacy PWA
+# TUUZA Pharmacy Procurement PWA
 
-Responsive Vite + React + TypeScript Progressive Web App, styled after the supplied Pharmly-inspired design. Includes the supplied Rwanda FDA October 2026 working-reference workbook as a bundled searchable medicine library. **This version intentionally has no Supabase or backend integration.**
+A local-first Vite + React + TypeScript PWA focused on the pharmacy purchasing workflow: build one master requisition, capture supplier quotations against the same product lines, compare offers, allocate suppliers, export one purchase list per supplier, record deliveries and calculate retail prices. No Supabase or backend is configured.
 
 ## Run locally
 
@@ -9,51 +9,36 @@ npm install
 npm run dev
 ```
 
-Build and preview:
+Production build and preview:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Deploy to Vercel
+## Vercel
 
-1. Push this project folder to a Git repository.
-2. Import the repository in Vercel.
-3. Select the **Vite** framework preset. Build command: `npm run build`; output directory: `dist`.
-4. Deploy. `vercel.json` adds SPA fallback rewrites (extension-less paths only, so `sw.js`, the manifest and assets are never rewritten) and cache headers (`sw.js` always revalidated, `/assets/*` immutable).
+Use Vite framework preset, `npm run build` build command and `dist` output directory. Root directory should contain `package.json`.
 
-Requires Node 18.18+. `xlsx` is installed from the SheetJS CDN tarball (the npm `xlsx@0.18.5` release has known security advisories); the install step needs outbound access to `cdn.sheetjs.com`, which Vercel allows.
+## Workflow included
 
-## What's implemented
+- Bundled 2,612-row medicine reference library from the supplied Rwanda FDA workbook.
+- Typo-tolerant local suggestions across generic name, brand, strength, dosage form and registration number. Exact product details must be verified before purchase.
+- One master requisition per purchasing round; repeated additions of the same catalogue item increase its quantity rather than creating duplicate lines.
+- Supplier directory with contact details and commercial notes.
+- Supplier quotations recorded against existing requisition lines, including price, availability, quoted pack size, delivery days and notes.
+- Lowest-price recommendation among offers with stock; delivery time is a tie-breaker. Users can manually select a different supplier.
+- Separate XLSX purchase-list export for each selected supplier and master-list export.
+- Receiving records and retail-price calculation: actual purchase cost per pack / sellable units per pack × markup factor (default 1.5).
+- JSON backup and restore for catalogue and operational data. XLSX exports for catalogue, requisitions, supplier purchase lists and receipt/pricing records.
+- PWA assets and Vercel SPA routing.
 
-- Responsive desktop/mobile navigation and dashboard.
-- Bundled medicine library from the workbook's `Products` sheet (2,612 source rows, 14 source fields preserved, plus provenance and verification flag).
-- Search across brand, generic, strength, dosage form, registration number, manufacturer and agent.
-- Product add/edit/deactivate, stock/reorder threshold fields and verification status.
-- XLSX/CSV import, duplicate-aware append, CSV exports and basic operational reports.
-- Supplier directory (basic add/remove).
-- Draft requisitions from selected products, editable status and CSV export.
-- Installable PWA: manifest with 192/512/maskable PNG icons, apple-touch-icon, auto-updating service worker.
-- Local persistence using IndexedDB (catalogue) and `localStorage` (suppliers, requisitions).
-- Offline support via a precaching service worker; in-app install button and offline indicator.
+## Important limitations
 
-## Storage limitation
+All operational data is saved on the current browser/device. There is no authentication, multi-user access, synchronization, automated supplier emailing, OCR, automatic regulatory verification, or remote database. Back up regularly; browser clearing can remove local changes. Supplier allocation is a recommendation and never sends an order.
 
-All changes are stored in the current browser on the current device. They are not shared between users or devices, and clearing browser data can remove locally stored changes. Export regular backups. No account authentication, remote database, or server synchronization is included in this version.
+The bundled catalogue is a working reference, not a guarantee of current registration status. Product match suggestions are heuristic and do not establish clinical equivalence. Check strength, dosage form, pack size, manufacturer and registration details before purchase.
 
-Quotation OCR, editable quotation line persistence, alias approval, price comparison, supplier allocation, PDF purchasing documents, stock movement audit workflow and automated backups are not yet implemented. The Quotations screen identifies this limitation rather than implying those features work.
+## Supplier quotation logic
 
-The supplied spreadsheet is treated as a **working reference register**, not independently verified regulatory truth. All imported records start with `source-imported-unverified`. Do not infer that missing information means a product is unregistered. Verify registration status with the current official source before making regulatory or purchasing decisions.
-
-The initial data set lives in `src/data/medicines.json` (about 1.5 MB). It is code-split and lazy-loaded on first run only; afterwards the catalogue is read from IndexedDB. Product edits are saved in IndexedDB (with a localStorage fallback); suppliers and requisitions use localStorage. Export regular backups.
-
-## Data import
-
-- The bundled catalogue is loaded from the workbook's `Products` sheet.
-- The import dialog accepts XLSX, XLS and CSV. Column headers such as `Generic Name`, `Brand Name`, `Registration No.`, `Strength`, `Dosage Form`, `Pack Size`, `Manufacturer`, `Country`, `MAH / Local Agent`, `Reg. Date`, and `Expiry Date` are recognized.
-- Existing matching registration/name/strength combinations are skipped when importing. Review the result after import.
-
-## Security and clinical-data boundaries
-
-No patient data is required. Product matching and registration verification are not automated claims. This release does not make therapeutic substitution recommendations or send purchase orders to suppliers.
+The default recommendation is the lowest price among entered offers with available quantity greater than zero; delivery days break price ties. This initial version compares the entered quoted unit price directly, so the user must ensure prices are normalized to comparable packs/units before comparing. Complex partial-quantity allocation, landed cost, minimum-order optimization and transport-cost optimization are future improvements.
